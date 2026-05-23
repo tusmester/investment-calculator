@@ -1,0 +1,439 @@
+@page "/"
+@rendermode InteractiveServer
+@using LakashitelKalkulator.Models
+@using LakashitelKalkulator.Services
+@using Microsoft.Extensions.Localization
+@inject ILoanCalculatorService CalculatorService
+@inject LocalizationService LocalizationService
+@inject IStringLocalizer Localizer
+@inject ICurrencyFormatterService CurrencyFormatter
+
+<PageTitle>@Localizer["AppTitle"]</PageTitle>
+
+<div class="bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body py-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h1 class="display-5 fw-bold mb-2 text-primary">
+                                    <i class="bi bi-calculator-fill me-2"></i>@Localizer["AppTitle"]
+                                </h1>
+                                <p class="lead text-muted mb-0">
+                                    <i class="bi bi-graph-up-arrow me-2"></i>@Localizer["CompareInvestments"]
+                                </p>
+                            </div>
+                            <div class="d-flex gap-3 align-items-center">
+                                <div>
+                                    <label class="form-label text-muted small mb-1">
+                                        <i class="bi bi-translate me-1"></i>@Localizer["Language"]
+                                    </label>
+                                    <select class="form-select form-select-lg shadow-sm" @onchange="OnLanguageChanged">
+                                        @foreach (var lang in LocalizationService.AvailableLanguages)
+                                        {
+                                            <option value="@lang" selected="@(lang == LocalizationService.CurrentLanguage)">
+                                                @(lang.ToUpper())
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label text-muted small mb-1">
+                                        <i class="bi bi-currency-exchange me-1"></i>@Localizer["Currency"]
+                                    </label>
+                                    <select class="form-select form-select-lg shadow-sm" @bind="_inputs.Currency">
+                                        @foreach (Currency currency in Enum.GetValues(typeof(Currency)))
+                                        {
+                                            <option value="@currency">@currency @CurrencyFormatter.GetCurrencySymbol(currency)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Input Column 1 - Purchase & Loan -->
+            <div class="col-lg-4">
+                <div class="card shadow border-0 h-100">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-house-door-fill me-2"></i>@Localizer["PurchaseAndLoan"]</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-cash-stack me-1"></i>@Localizer["HousePrice"]
+                                <i class="bi bi-info-circle text-primary ms-1" title="@Localizer["HousePriceTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.HousePrice" />
+                                <span class="input-group-text">@CurrencyFormatter.GetCurrencySymbol(_inputs.Currency)</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["HousePriceTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-percent me-1"></i>@Localizer["DownPaymentPercentage"]
+                                <i class="bi bi-info-circle text-primary ms-1" title="@Localizer["DownPaymentPercentageTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.DownPaymentPercentage" step="0.1" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["DownPaymentPercentageTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-tools me-1"></i>@Localizer["AdditionalCosts"]
+                                <i class="bi bi-info-circle text-primary ms-1" title="@Localizer["AdditionalCostsTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.AdditionalInitialCosts" />
+                                <span class="input-group-text">@CurrencyFormatter.GetCurrencySymbol(_inputs.Currency)</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["AdditionalCostsTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-calendar-range me-1"></i>@Localizer["LoanDuration"]
+                                <i class="bi bi-info-circle text-primary ms-1" title="@Localizer["LoanDurationTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.LoanDurationYears" />
+                                <span class="input-group-text">@Localizer["Years"]</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["LoanDurationTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-bank me-1"></i>@Localizer["LoanInterest"]
+                                <i class="bi bi-info-circle text-primary ms-1" title="@Localizer["LoanInterestTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.LoanInterestRate" step="0.1" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["LoanInterestTooltip"]</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Column 2 - Operating & Returns -->
+            <div class="col-lg-4">
+                <div class="card shadow border-0 h-100">
+                    <div class="card-header bg-info text-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i>@Localizer["OperatingAndReturns"]</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-key me-1"></i>@Localizer["InitialRent"]
+                                <i class="bi bi-info-circle text-info ms-1" title="@Localizer["InitialRentTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.InitialMonthlyRent" />
+                                <span class="input-group-text">@CurrencyFormatter.GetCurrencySymbol(_inputs.Currency)</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["InitialRentTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-receipt me-1"></i>@Localizer["RentTax"]
+                                <i class="bi bi-info-circle text-info ms-1" title="@Localizer["RentTaxTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.YearlyRentTax" step="0.1" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["RentTaxTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-wrench me-1"></i>@Localizer["OtherCosts"]
+                                <i class="bi bi-info-circle text-info ms-1" title="@Localizer["OtherCostsTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.OtherFixedHomeCostsPerYear" />
+                                <span class="input-group-text">@CurrencyFormatter.GetCurrencySymbol(_inputs.Currency)</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["OtherCostsTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-house-up me-1"></i>@Localizer["EstimatedHomeIncrease"]
+                                <i class="bi bi-info-circle text-info ms-1" title="@Localizer["EstimatedHomeIncreaseTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.EstimatedHomePriceYearlyIncrease" step="0.1" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["EstimatedHomeIncreaseTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-arrow-down-circle me-1"></i>@Localizer["YearlyAmortization"]
+                                <i class="bi bi-info-circle text-info ms-1" title="@Localizer["YearlyAmortizationTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.YearlyAmortizationPercentage" step="0.1" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["YearlyAmortizationTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-arrow-up-right me-1"></i>@Localizer["Inflation"]
+                                <i class="bi bi-info-circle text-info ms-1" title="@Localizer["InflationTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.EstimatedInflationPerYear" step="0.1" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["InflationTooltip"]</small>
+                        </div>
+
+                        <hr class="my-3" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-piggy-bank me-1"></i>@Localizer["EstimatedInvestmentGains"]
+                                <i class="bi bi-info-circle text-success ms-1" title="@Localizer["EstimatedInvestmentGainsTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.EstimatedInvestmentGainsPercentage" step="0.1" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["EstimatedInvestmentGainsTooltip"]</small>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-success btn-lg shadow-lg py-3" @onclick="Calculate">
+                                <i class="bi bi-calculator me-2"></i>@Localizer["Calculate"]
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Column -->
+            <div class="col-lg-4">
+                @if (_result != null)
+                {
+                    <div class="card shadow border-0 mb-4">
+                        <div class="card-header @(_result.IsHomeOwnershipBetter ? "bg-primary" : "bg-success") text-white py-3">
+                            <h5 class="mb-0"><i class="bi bi-trophy-fill me-2"></i>@Localizer["Results"]</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert @(_result.IsHomeOwnershipBetter ? "alert-primary" : "alert-success") shadow-sm border-0" role="alert">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="bg-white rounded-circle p-3 me-3 shadow-sm">
+                                        <i class="bi @(_result.IsHomeOwnershipBetter ? "bi-house-heart-fill" : "bi-graph-up-arrow") fs-2 @(_result.IsHomeOwnershipBetter ? "text-primary" : "text-success")"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 text-uppercase small">@Localizer["Winner"]</h6>
+                                        <h4 class="mb-0 fw-bold">
+                                            @(_result.IsHomeOwnershipBetter ? 
+                                                LocalizationService.GetString("HomeOwnership") : 
+                                                LocalizationService.GetString("Investment"))
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div class="bg-white bg-opacity-75 rounded p-3">
+                                    <div class="text-center">
+                                        <small class="text-muted d-block mb-1">@Localizer["Difference"]</small>
+                                        <h3 class="mb-0 fw-bold">@FormatCurrency(Math.Abs(_result.Difference))</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <div class="card bg-primary bg-opacity-10 border-0 h-100">
+                                        <div class="card-body text-center py-3">
+                                            <i class="bi bi-house-fill text-primary fs-3 mb-2"></i>
+                                            <h6 class="text-muted small mb-1">@Localizer["HomeOwnership"]</h6>
+                                            <h5 class="mb-0 fw-bold text-primary">@FormatCurrency(_result.HomeOwnershipNetWorth)</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="card bg-success bg-opacity-10 border-0 h-100">
+                                        <div class="card-body text-center py-3">
+                                            <i class="bi bi-piggy-bank-fill text-success fs-3 mb-2"></i>
+                                            <h6 class="text-muted small mb-1">@Localizer["Investment"]</h6>
+                                            <h5 class="mb-0 fw-bold text-success">@FormatCurrency(_result.InvestmentNetWorth)</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion shadow-sm" id="detailsAccordion">
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#homeDetails">
+                                            <i class="bi bi-house-door me-2"></i>@Localizer["HomeOwnership"]
+                                        </button>
+                                    </h2>
+                                    <div id="homeDetails" class="accordion-collapse collapse show" data-bs-parent="#detailsAccordion">
+                                        <div class="accordion-body">
+                                            <table class="table table-sm mb-0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td><i class="bi bi-calendar-month me-1"></i>@Localizer["MonthlyPayment"]</td>
+                                                        <td class="text-end fw-semibold">@FormatCurrency(_result.MonthlyLoanPayment)</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><i class="bi bi-percent me-1"></i>@Localizer["TotalInterest"]</td>
+                                                        <td class="text-end fw-semibold">@FormatCurrency(_result.TotalInterestPaid)</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><i class="bi bi-house-check me-1"></i>@Localizer["FinalHomeValue"]</td>
+                                                        <td class="text-end fw-semibold text-success">@FormatCurrency(_result.FinalHomeValue)</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><i class="bi bi-arrow-down me-1"></i>@Localizer["TotalAmortization"]</td>
+                                                        <td class="text-end fw-semibold text-danger">@FormatCurrency(_result.TotalAmortization)</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><i class="bi bi-tools me-1"></i>@Localizer["TotalOtherCosts"]</td>
+                                                        <td class="text-end fw-semibold text-danger">@FormatCurrency(_result.TotalOtherCosts)</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><i class="bi bi-cash-coin me-1"></i>@Localizer["TotalRentIncome"]</td>
+                                                        <td class="text-end fw-semibold text-success">@FormatCurrency(_result.TotalRentIncome)</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><i class="bi bi-receipt-cutoff me-1"></i>@Localizer["TotalRentTax"]</td>
+                                                        <td class="text-end fw-semibold text-danger">@FormatCurrency(_result.TotalRentTax)</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-3">
+                                <a href="#yearlyBreakdownTable" class="btn btn-outline-info btn-sm" onclick="document.getElementById('yearlyBreakdownTable').scrollIntoView({behavior: 'smooth'});">
+                                    <i class="bi bi-arrow-down-circle me-1"></i>
+                                    @Localizer["ViewYearlyBreakdown"]
+                                    <i class="bi bi-chevron-double-down ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-5">
+                            <i class="bi bi-calculator display-1 text-muted mb-4"></i>
+                            <h4 class="text-muted mb-3">@Localizer["NoResultsYet"]</h4>
+                            <p class="text-muted">@Localizer["FillFieldsMessage"]</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Yearly Breakdown Table - Full Width -->
+        @if (_result != null)
+        {
+            <div class="row mt-4" id="yearlyBreakdownTable">
+                <div class="col-12">
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-info text-white py-3">
+                            <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>@Localizer["YearlyBreakdown"]</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div style="max-height: 500px; overflow-y: auto;">
+                                <table class="table table-hover table-sm mb-0">
+                                    <thead class="sticky-top bg-light">
+                                        <tr>
+                                            <th class="py-3"><i class="bi bi-calendar3 me-1"></i>@Localizer["Year"]</th>
+                                            <th class="text-end py-3"><i class="bi bi-house me-1"></i>@Localizer["HomeEquity"]</th>
+                                            <th class="text-end py-3"><i class="bi bi-graph-up me-1"></i>@Localizer["InvestmentValue"]</th>
+                                            <th class="text-end py-3 text-muted"><i class="bi bi-cash-coin me-1"></i>@Localizer["YearlyRentIncome"]</th>
+                                            <th class="text-end py-3 text-muted"><i class="bi bi-arrow-down me-1"></i>@Localizer["YearlyAmortization"]</th>
+                                            <th class="text-end py-3 text-muted"><i class="bi bi-bank2 me-1"></i>@Localizer["YearlyRentSurplus"]</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var year in _result.YearlyBreakdowns)
+                                        {
+                                            var isHomeAhead = year.HomeEquity > year.InvestmentValue;
+                                            var isSurplusPositive = year.YearlyRentSurplus > 0;
+                                            <tr>
+                                                <td class="fw-semibold">@year.Year</td>
+                                                <td class="text-end @(isHomeAhead ? "fw-bold text-primary" : "")">
+                                                    @FormatCurrency(year.HomeEquity)
+                                                    @if (isHomeAhead && year.Year > 0) { <i class="bi bi-arrow-up-circle-fill text-primary ms-1"></i> }
+                                                </td>
+                                                <td class="text-end @(!isHomeAhead ? "fw-bold text-success" : "")">
+                                                    @FormatCurrency(year.InvestmentValue)
+                                                    @if (!isHomeAhead && year.Year > 0) { <i class="bi bi-arrow-up-circle-fill text-success ms-1"></i> }
+                                                </td>
+                                                <td class="text-end text-muted">
+                                                    @(year.Year > 0 ? FormatCurrency(year.YearlyRentIncome) : "-")
+                                                </td>
+                                                <td class="text-end text-danger">
+                                                    @(year.Year > 0 ? FormatCurrency(year.YearlyAmortization) : "-")
+                                                </td>
+                                                <td class="text-end @(isSurplusPositive ? "text-success" : "text-danger")">
+                                                    @(year.Year > 0 ? FormatCurrency(year.YearlyRentSurplus) : "-")
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private CalculatorInputs _inputs = new();
+    private CalculationResult? _result;
+
+    private void Calculate()
+    {
+        _result = CalculatorService.Calculate(_inputs);
+    }
+
+    private string FormatCurrency(decimal value)
+    {
+        var formatted = CurrencyFormatter.Format(value, _inputs.Currency);
+        var symbol = CurrencyFormatter.GetCurrencySymbol(_inputs.Currency);
+        return $"{formatted} {symbol}";
+    }
+
+    private void OnLanguageChanged(ChangeEventArgs e)
+    {
+        if (e.Value?.ToString() is string lang)
+        {
+            LocalizationService.SetLanguage(lang);
+            StateHasChanged();
+        }
+    }
+}
+

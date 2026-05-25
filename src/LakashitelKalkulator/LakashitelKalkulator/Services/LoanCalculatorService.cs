@@ -1,5 +1,4 @@
 using LakashitelKalkulator.Models;
-using Microsoft.Extensions.Logging;
 
 namespace LakashitelKalkulator.Services;
 
@@ -12,7 +11,7 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
 {
     public CalculationResult Calculate(CalculatorInputs inputs)
     {
-        logger.LogInformation("Starting calculation for house price: {HousePrice}", inputs.HousePrice);
+        logger.LogTrace("Starting calculation for house price: {HousePrice}", inputs.HousePrice);
 
         var result = new CalculationResult();
 
@@ -25,6 +24,8 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
         var numberOfPayments = inputs.LoanDurationYears * 12;
 
         // Calculate monthly payment using amortization formula
+        // "What fixed payment, made every month with compound interest, will reduce
+        // the loan to zero after exactly n payments?"
         var monthlyPayment = loanAmount * monthlyInterestRate * 
             (decimal)Math.Pow((double)(1 + monthlyInterestRate), (double)numberOfPayments) / 
             ((decimal)Math.Pow((double)(1 + monthlyInterestRate), (double)numberOfPayments) - 1);
@@ -91,7 +92,7 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
                 // Apply investment return to existing surplus investments
                 rentSurplusInvestment = rentSurplusInvestment * (1 + monthlyInvestmentReturnRate);
 
-                // If there's surplus rent, invest it; if deficit, withdraw from investments
+                // If there's surplus rent, invest it
                 rentSurplusInvestment += monthlyRentSurplus;
 
                 // === ALTERNATIVE INVESTMENT PATH ===

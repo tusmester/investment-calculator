@@ -71,7 +71,24 @@ public class LocalizationService : IStringLocalizer
             ["Years"] = "év",
             ["NoResultsYet"] = "Nincs még eredmény",
             ["FillFieldsMessage"] = "Töltsd ki a mezőket és kattints a Számol gombra",
-            ["ViewYearlyBreakdown"] = "Részletes éves bontás"
+            ["ViewYearlyBreakdown"] = "Részletes éves bontás",
+            ["HowItWorks"] = "Hogyan működik?",
+            ["PropertyPathTitle"] = "Befektetési Ingatlan Út",
+            ["PropertyPathDesc"] = "Ebben a forgatókönyvben megvásárolsz egy befektetési ingatlant, amit bérbeadsz.",
+            ["PropertyInitialCosts"] = "Kezdeti költségek: Önerő + egyéb kezdeti költségek (felújítás, illetékek)",
+            ["PropertyMonthlyIncome"] = "Havi bevétel: Bérleti díj (adózás után)",
+            ["PropertyMonthlyCosts"] = "Havi költségek: Hitel törlesztő + egyéb költségek (közös, biztosítás)",
+            ["PropertyRentSurplus"] = "Bérleti többlet: Ha a bevétel meghaladja a költségeket, a különbözetet befektetjük",
+            ["PropertyAppreciation"] = "Ingatlan értéknövekedés: Az ingatlan értéke évente nő",
+            ["PropertyDepreciation"] = "Amortizáció: Az épület elhasználódása csökkenti az értéket",
+            ["PropertyFinalValue"] = "Végső érték: Ingatlan értéke - amortizáció + befektetett bérleti többlet",
+            ["InvestmentPathTitle"] = "Alternatív Befektetési Út",
+            ["InvestmentPathDesc"] = "Ebben a forgatókönyvben nem vásárolsz ingatlant, hanem befektetsz (pl. részvény, kötvény).",
+            ["InvestmentInitialAmount"] = "Kezdő tőke: Ugyanannyi, mint az ingatlan esetén (önerő + egyéb költségek)",
+            ["InvestmentMonthlyContribution"] = "Havi befektetés: A megtakarított költségek (törlesztő + egyéb + amortizáció) - elveszített bérleti díj",
+            ["InvestmentNoNegative"] = "Ha a befektetés negatív lenne (bérleti díj > megtakarított költségek), akkor 0-t fektetünk be",
+            ["InvestmentCompoundGrowth"] = "Kamatos kamat: A befektetés havonta kamatozik a becsült éves befektetési hozam szerint",
+            ["InvestmentFinalValue"] = "Végső érték: Befektetés kamatos kamattal + havi befektetések"
         },
         ["en"] = new Dictionary<string, string>
         {
@@ -132,7 +149,24 @@ public class LocalizationService : IStringLocalizer
             ["Years"] = "years",
             ["NoResultsYet"] = "No Results Yet",
             ["FillFieldsMessage"] = "Fill in the fields and click Calculate",
-            ["ViewYearlyBreakdown"] = "View Yearly Breakdown"
+            ["ViewYearlyBreakdown"] = "View Yearly Breakdown",
+            ["HowItWorks"] = "How It Works?",
+            ["PropertyPathTitle"] = "Investment Property Path",
+            ["PropertyPathDesc"] = "In this scenario, you purchase an investment property and rent it out.",
+            ["PropertyInitialCosts"] = "Initial costs: Down payment + additional costs (renovation, fees)",
+            ["PropertyMonthlyIncome"] = "Monthly income: Rental income (after tax)",
+            ["PropertyMonthlyCosts"] = "Monthly costs: Loan payment + other costs (common, insurance)",
+            ["PropertyRentSurplus"] = "Rent surplus: If income exceeds costs, the difference is invested",
+            ["PropertyAppreciation"] = "Property appreciation: Property value increases annually",
+            ["PropertyDepreciation"] = "Amortization: Building wear and tear decreases value",
+            ["PropertyFinalValue"] = "Final value: Property value - amortization + invested rent surplus",
+            ["InvestmentPathTitle"] = "Alternative Investment Path",
+            ["InvestmentPathDesc"] = "In this scenario, you don't buy property but invest instead (e.g., stocks, bonds).",
+            ["InvestmentInitialAmount"] = "Initial capital: Same as property scenario (down payment + other costs)",
+            ["InvestmentMonthlyContribution"] = "Monthly investment: Saved costs (loan payment + other + amortization) - lost rental income",
+            ["InvestmentNoNegative"] = "If investment would be negative (rent > saved costs), we invest 0",
+            ["InvestmentCompoundGrowth"] = "Compound interest: Investment grows monthly according to estimated investment gains",
+            ["InvestmentFinalValue"] = "Final value: Investment with compound interest + monthly contributions"
         }
     };
 

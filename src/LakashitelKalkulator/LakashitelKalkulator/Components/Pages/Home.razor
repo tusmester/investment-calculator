@@ -40,6 +40,7 @@
                                         }
                                     </select>
                                 </div>
+                                @* Currency selector hidden until conversion logic is implemented
                                 <div>
                                     <label class="form-label text-muted small mb-1">
                                         <i class="bi bi-currency-exchange me-1"></i>@Localizer["Currency"]
@@ -50,6 +51,106 @@
                                             <option value="@currency">@currency @CurrencyFormatter.GetCurrencySymbol(currency)</option>
                                         }
                                     </select>
+                                </div>
+                                *@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation Panel -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-info text-white py-3">
+                        <button class="btn btn-link text-decoration-none w-100 text-start p-0 collapsed text-white" 
+                                type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#explanationPanel" 
+                                aria-expanded="false">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 text-white">
+                                    <i class="bi bi-info-circle-fill me-2"></i>@Localizer["HowItWorks"]
+                                </h5>
+                                <i class="bi bi-chevron-down"></i>
+                            </div>
+                        </button>
+                    </div>
+                    <div id="explanationPanel" class="collapse">
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Property Path Column -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h5 class="text-primary">
+                                            <i class="bi bi-house-fill me-2"></i>@Localizer["PropertyPathTitle"]
+                                        </h5>
+                                        <p class="text-muted">@Localizer["PropertyPathDesc"]</p>
+                                    </div>
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            <strong>@Localizer["PropertyInitialCosts"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-arrow-down-circle text-success me-2"></i>
+                                            <strong>@Localizer["PropertyMonthlyIncome"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-arrow-up-circle text-danger me-2"></i>
+                                            <strong>@Localizer["PropertyMonthlyCosts"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-piggy-bank text-info me-2"></i>
+                                            <strong>@Localizer["PropertyRentSurplus"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-graph-up-arrow text-success me-2"></i>
+                                            <strong>@Localizer["PropertyAppreciation"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-arrow-down text-warning me-2"></i>
+                                            <strong>@Localizer["PropertyDepreciation"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-trophy-fill text-primary me-2"></i>
+                                            <strong>@Localizer["PropertyFinalValue"]</strong>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Investment Path Column -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h5 class="text-success">
+                                            <i class="bi bi-graph-up me-2"></i>@Localizer["InvestmentPathTitle"]
+                                        </h5>
+                                        <p class="text-muted">@Localizer["InvestmentPathDesc"]</p>
+                                    </div>
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            <strong>@Localizer["InvestmentInitialAmount"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-arrow-right-circle text-info me-2"></i>
+                                            <strong>@Localizer["InvestmentMonthlyContribution"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-exclamation-circle text-warning me-2"></i>
+                                            <strong>@Localizer["InvestmentNoNegative"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-percent text-success me-2"></i>
+                                            <strong>@Localizer["InvestmentCompoundGrowth"]</strong>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-trophy-fill text-success me-2"></i>
+                                            <strong>@Localizer["InvestmentFinalValue"]</strong>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>

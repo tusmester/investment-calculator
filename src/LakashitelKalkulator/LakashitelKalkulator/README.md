@@ -1,6 +1,6 @@
 # Lakáshitel Kalkulátor / Home Loan Calculator
 
-A comprehensive Blazor application for comparing home ownership vs investment strategies.
+An application for comparing home ownership vs investment strategies.
 
 ## Features
 
@@ -37,7 +37,6 @@ A comprehensive Blazor application for comparing home ownership vs investment st
 4. Net worth = total investment value
 
 ### Features
-- **Multi-currency support**: HUF, EUR, USD, GBP
 - **Bilingual UI**: Hungarian (default) and English
 - **Detailed yearly breakdown**: Track equity and investment growth year by year
 - **Comprehensive results**: See winner, monthly payments, total costs, and final values
@@ -55,12 +54,6 @@ A comprehensive Blazor application for comparing home ownership vs investment st
 - **CalculatorInputs**: All input parameters
 - **CalculationResult**: Comprehensive results with yearly breakdowns
 - **Currency**: Supported currencies enum
-
-### Design Principles
-- Dependency injection for all services
-- Separation of concerns (logic in services, not UI)
-- Minimal logging for diagnostics
-- Clean, maintainable code structure
 
 ## Running the Application
 

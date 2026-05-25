@@ -251,6 +251,18 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">
+                                <i class="bi bi-calendar-x me-1"></i>@Localizer["InitialEmptyMonths"]
+                                <i class="bi bi-info-circle text-info ms-1" title="@Localizer["InitialEmptyMonthsTooltip"]" data-bs-toggle="tooltip"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control shadow-sm" @bind="_inputs.InitialEmptyMonths" min="0" />
+                                <span class="input-group-text">@Localizer["Months"]</span>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">@Localizer["InitialEmptyMonthsTooltip"]</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
                                 <i class="bi bi-receipt me-1"></i>@Localizer["RentTax"]
                                 <i class="bi bi-info-circle text-info ms-1" title="@Localizer["RentTaxTooltip"]" data-bs-toggle="tooltip"></i>
                             </label>

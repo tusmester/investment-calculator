@@ -14,6 +14,7 @@ public class CalculatorInputs
     public decimal OtherFixedHomeCostsPerYear { get; set; } = 120_000;
     public decimal EstimatedInflationPerYear { get; set; } = 3.8m;
     public decimal InitialMonthlyRent { get; set; } = 160_000;
+    public int InitialEmptyMonths { get; set; } = 4;
     public Currency Currency { get; set; } = Currency.HUF;
 }
 

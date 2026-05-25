@@ -39,6 +39,7 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
         var rentSurplusInvestment = 0m; // Track invested rent surplus for property path
         var currentMonthlyRent = inputs.InitialMonthlyRent;
         var monthlyInvestmentReturnRate = inputs.EstimatedInvestmentGainsPercentage / 100 / 12;
+        var cumulativeAmortization = 0m;
 
         // Add year 0 to show initial state
         result.YearlyBreakdowns.Add(new YearlyBreakdown
@@ -119,14 +120,17 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
             // Calculate amortization
             var yearlyAmortization = yearlyBreakdown.HomeValue * inputs.YearlyAmortizationPercentage / 100;
             yearlyBreakdown.YearlyAmortization = yearlyAmortization;
+            cumulativeAmortization += yearlyAmortization;
 
             // Calculate rent surplus (rent after tax minus loan payment and other costs)
             var yearlyPropertyCosts = monthlyPayment * 12 + inputs.OtherFixedHomeCostsPerYear;
             yearlyBreakdown.YearlyRentSurplus = netRentIncome - yearlyPropertyCosts;
 
-            // Update remaining loan and equity
+            // Update remaining loan and equity            
             yearlyBreakdown.RemainingLoanBalance = remainingLoan;
-            yearlyBreakdown.HomeEquity = yearlyBreakdown.HomeValue - remainingLoan + rentSurplusInvestment;
+
+            // HomeEquity includes the cumulative amortization subtraction to match final net worth
+            yearlyBreakdown.HomeEquity = yearlyBreakdown.HomeValue - remainingLoan + rentSurplusInvestment - cumulativeAmortization;
 
             yearlyBreakdown.YearlyInvestmentContribution = yearlyInvestmentContribution;
             yearlyBreakdown.InvestmentValue = investmentValue;
@@ -149,8 +153,8 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
         result.TotalRentTax = result.TotalRentIncome * inputs.YearlyRentTax / 100;
 
         // Net worth calculations
-        // Property path: equity already includes invested rent surplus
-        result.HomeOwnershipNetWorth = finalBreakdown.HomeEquity - result.TotalAmortization;
+        // Property path: equity already includes invested rent surplus AND cumulative amortization subtraction
+        result.HomeOwnershipNetWorth = finalBreakdown.HomeEquity;
 
         result.InvestmentNetWorth = finalBreakdown.InvestmentValue;
 

@@ -14,6 +14,7 @@ public class CalculationResult
     public decimal TotalOtherCosts { get; set; }
     public decimal TotalRentIncome { get; set; }
     public decimal TotalRentTax { get; set; }
+    public decimal FinalSellingCosts { get; set; }
     public List<YearlyBreakdown> YearlyBreakdowns { get; set; } = new();
 }
 

@@ -92,7 +92,10 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
                 // === PROPERTY PATH: Invest rent surplus ===
                 // Calculate monthly rent surplus after expenses
                 // During initial empty months (renovation), rent is 0
-                var monthlyRentAfterTax = absoluteMonth > inputs.InitialEmptyMonths 
+                // Also account for empty months per year due to renter changes
+                var isInitialEmptyPeriod = absoluteMonth <= inputs.InitialEmptyMonths;
+                var isYearlyEmptyMonth = year > 1 && month <= inputs.EmptyMonthsPerYear;
+                var monthlyRentAfterTax = !isInitialEmptyPeriod && !isYearlyEmptyMonth
                     ? currentMonthlyRent * (1 - inputs.YearlyRentTax / 100)
                     : 0;
 
@@ -161,9 +164,13 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
         result.TotalRentIncome = result.YearlyBreakdowns.Sum(y => y.YearlyRentIncome);
         result.TotalRentTax = result.TotalRentIncome * inputs.YearlyRentTax / 100;
 
+        // Calculate final selling costs (percentage of final home value)
+        result.FinalSellingCosts = finalBreakdown.HomeValue * inputs.FinalSellingCostsPercentage / 100;
+
         // Net worth calculations
         // Property path: equity already includes invested rent surplus AND cumulative amortization subtraction
-        result.HomeOwnershipNetWorth = finalBreakdown.HomeEquity;
+        // Subtract the final selling costs from the home ownership net worth
+        result.HomeOwnershipNetWorth = finalBreakdown.HomeEquity - result.FinalSellingCosts;
 
         result.InvestmentNetWorth = finalBreakdown.InvestmentValue;
 

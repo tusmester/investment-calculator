@@ -71,8 +71,13 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
             // Calculate monthly amortization for this year (based on current year's home value)
             var monthlyAmortization = (yearlyBreakdown.HomeValue * inputs.YearlyAmortizationPercentage / 100) / 12;
 
+            // Calculate which month of the entire loan period we're in
+            int startingMonthOfYear = (year - 1) * 12 + 1;
+
             for (int month = 1; month <= 12; month++)
             {
+                int absoluteMonth = startingMonthOfYear + month - 1;
+
                 // Loan payment processing
                 var interestPayment = remainingLoan * monthlyInterestRate;
                 var principalPayment = monthlyPayment - interestPayment;
@@ -86,7 +91,14 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
 
                 // === PROPERTY PATH: Invest rent surplus ===
                 // Calculate monthly rent surplus after expenses
-                var monthlyRentAfterTax = currentMonthlyRent * (1 - inputs.YearlyRentTax / 100);
+                // During initial empty months (renovation), rent is 0
+                // Also account for empty months per year due to renter changes
+                var isInitialEmptyPeriod = absoluteMonth <= inputs.InitialEmptyMonths;
+                var isYearlyEmptyMonth = year > 1 && month <= inputs.EmptyMonthsPerYear;
+                var monthlyRentAfterTax = !isInitialEmptyPeriod && !isYearlyEmptyMonth
+                    ? currentMonthlyRent * (1 - inputs.YearlyRentTax / 100)
+                    : 0;
+
                 var monthlyPropertyCosts = monthlyPayment + (inputs.OtherFixedHomeCostsPerYear / 12);
                 var monthlyRentSurplus = monthlyRentAfterTax - monthlyPropertyCosts;
 
@@ -102,7 +114,7 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
 
                 // Then add monthly contributions (money saved by NOT buying the investment property):
                 // What you save: loan payment + other costs + amortization (depreciation you avoid)
-                // What you lose: rent income (after tax)
+                // What you lose: rent income (after tax) - but only after renovation period
                 // Note: If contribution would be negative (lost rent > avoided costs), we invest 0 instead
                 var monthlyContribution = Math.Max(0, monthlyPayment + (inputs.OtherFixedHomeCostsPerYear / 12) + monthlyAmortization - monthlyRentAfterTax);
 
@@ -152,9 +164,13 @@ public class LoanCalculatorService(ILogger<LoanCalculatorService> logger) : ILoa
         result.TotalRentIncome = result.YearlyBreakdowns.Sum(y => y.YearlyRentIncome);
         result.TotalRentTax = result.TotalRentIncome * inputs.YearlyRentTax / 100;
 
+        // Calculate final selling costs (percentage of final home value)
+        result.FinalSellingCosts = finalBreakdown.HomeValue * inputs.FinalSellingCostsPercentage / 100;
+
         // Net worth calculations
         // Property path: equity already includes invested rent surplus AND cumulative amortization subtraction
-        result.HomeOwnershipNetWorth = finalBreakdown.HomeEquity;
+        // Subtract the final selling costs from the home ownership net worth
+        result.HomeOwnershipNetWorth = finalBreakdown.HomeEquity - result.FinalSellingCosts;
 
         result.InvestmentNetWorth = finalBreakdown.InvestmentValue;
 
